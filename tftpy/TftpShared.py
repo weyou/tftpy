@@ -10,6 +10,7 @@ SOCK_TIMEOUT = 5
 MAX_DUPS = 20
 TIMEOUT_RETRIES = 5
 DEF_TFTP_PORT = 69
+INFINITE = -1
 
 # A hook for deliberately introducing delay in testing.
 DELAY_BLOCK = 0

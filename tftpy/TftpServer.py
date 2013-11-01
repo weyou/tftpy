@@ -56,12 +56,17 @@ class TftpServer(TftpSession):
     def listen(self,
                listenip="",
                listenport=DEF_TFTP_PORT,
-               timeout=SOCK_TIMEOUT):
+               timeout=SOCK_TIMEOUT,
+               timeroff=INFINITE
+               ):
         """Start a server listening on the supplied interface and port. This
         defaults to INADDR_ANY (all interfaces) and UDP port 69. You can also
         supply a different socket timeout value, if desired. The
         server_callback is a callable that will be called when the transfer is
-        complete, being passed"""
+        complete, being passed
+        *timeroff* is used in some test scenario. It's a integer number in
+        seconds. Server will exist after this timer expired.
+        """
 
         tftp_factory = TftpPacketFactory()
 
@@ -79,6 +84,7 @@ class TftpServer(TftpSession):
             raise
 
         log.info("Starting receive loop...")
+        tm_start = time.time()
         while True:
             log.debug("shutdown_immediately is %s", self.shutdown_immediately)
             log.debug("shutdown_gracefully is %s", self.shutdown_gracefully)
@@ -93,6 +99,12 @@ class TftpServer(TftpSession):
             elif self.shutdown_gracefully:
                 if not self.sessions:
                     log.warn("In graceful shutdown mode and all sessions complete.")
+                    self.sock.close()
+                    break
+
+            if time.time() - tm_start > timeroff:
+                if not self.sessions:
+                    log.warn("Server run timer expired and all sessions complete.")
                     self.sock.close()
                     break
 
