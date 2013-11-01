@@ -18,7 +18,7 @@ class TftpServer(TftpSession):
     read from during downloads. This permits the serving of dynamic
     content."""
 
-    def __init__(self, tftproot='/tftpboot', dyn_file_func=None):
+    def __init__(self, tftproot='/tftpboot', dyn_file_func=None, transfer_done_func=None):
         self.listenip = None
         self.listenport = None
         self.sock = None
@@ -28,7 +28,7 @@ class TftpServer(TftpSession):
         # A dict of sessions, where each session is keyed by a string like
         # ip:tid for the remote end.
         self.sessions = {}
-        self.server_callback = None
+        self.server_callback = transfer_done_func
 
         self.shutdown_gracefully = False
         self.shutdown_immediately = False
@@ -56,16 +56,14 @@ class TftpServer(TftpSession):
     def listen(self,
                listenip="",
                listenport=DEF_TFTP_PORT,
-               server_callback=None,
                timeout=SOCK_TIMEOUT):
         """Start a server listening on the supplied interface and port. This
         defaults to INADDR_ANY (all interfaces) and UDP port 69. You can also
         supply a different socket timeout value, if desired. The
         server_callback is a callable that will be called when the transfer is
-        complete, being passed
+        complete, being passed"""
 
         tftp_factory = TftpPacketFactory()
-        self.server_callback = server_callback
 
         # Don't use new 2.5 ternary operator yet
         # listenip = listenip if listenip else '0.0.0.0'
