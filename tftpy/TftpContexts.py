@@ -102,12 +102,6 @@ class TftpContext(object):
         """Fetch the current blocksize for this session."""
         return int(self.options.get('blksize', 512))
 
-    def __del__(self):
-        """Simple destructor to try to call housekeeping in the end method if
-        not called explicitely. Leaking file descriptors is not a good
-        thing."""
-        self.end()
-
     def checkTimeout(self, now):
         """Compare current time with last_update time, and raise an exception
         if we're over the timeout time."""
